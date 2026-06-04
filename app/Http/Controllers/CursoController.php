@@ -4,97 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\Curso;
 use App\Http\Requests\CursoRequest;
-use Illuminate\Support\Facades\Gate;
+use App\Services\CursoService;
+use Illuminate\Database\Eloquent\Model;
 
-class CursoController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index() {
-        Gate::authorize('viewAny', Curso::class);
-        $data = Curso::with(['disciplina', 'aluno'])->orderBy('nome')->get();
-        return view('curso.index', compact(['data']));
+class CursoController extends BaseController {
+
+    protected array $view = [
+        'index'     => 'curso.index',
+        'create'    => 'curso.create',
+        'store'     => 'curso.index',
+        'show'      => 'curso.show',
+        'edit'      => 'curso.edit',
+        'update'    => 'curso.index',
+        'destroy'   => 'curso.index'
+    ];
+
+    protected array $with = ['disciplina', 'aluno'];
+
+    protected string $orderBy = 'nome';
+
+    public function __construct(
+        protected CursoService $service,
+        protected Curso $model
+    ) {}
+
+    protected function getService(): mixed {
+        return $this->service;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create() {
-        Gate::authorize('create', Curso::class);
-        return view('curso.create');
+    protected function getModel(): Model {
+        return $this->model;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(CursoRequest $request)
-    {
-        Gate::authorize('create', Curso::class);
-        $validado = $request->validated();
-        Curso::create($validado);
-        return redirect()->route('curso.index');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $curso = Curso::find($id);
-        Gate::authorize('view', $curso);
-
-        if(isset($curso)) {
-            return view('curso.show', compact(['curso']));
-        }
-
-        return "<h1>Curso não encontrado!</h1>";
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $curso = Curso::find($id);
-        Gate::authorize('update', $curso);
-
-        if(isset($curso)) {
-            return view('curso.edit', compact(['curso']));
-        }
-
-        return "<h1>Curso não encontrado!</h1>";
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(CursoRequest $request, string $id)
-    {
-        $curso = Curso::find($id);
-        Gate::authorize('update', $curso);
-
-        if(isset($curso)) {
-            $curso->update($request->validated());
-            return redirect()->route('curso.index');
-        }
-
-        return "<h1>Curso não encontrado!</h1>";
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        $curso = Curso::find($id);
-        Gate::authorize('delete', $curso);
-
-        if(isset($curso)) {
-            $curso->delete();
-            return redirect()->route('curso.index');
-        }
-
-        return "<h1>Curso não encontrado!</h1>";
+    protected function getRequestClass(): string {
+        return CursoRequest::class;
     }
 }

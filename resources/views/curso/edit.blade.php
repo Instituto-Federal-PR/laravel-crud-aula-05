@@ -6,7 +6,7 @@
     ]
 )
 @section('conteudo')
-    <form action="{{route('curso.update', $curso->id)}}" method="POST">
+    <form action="{{route('curso.update', $row->id)}}" method="POST">
         @csrf
         @method('PUT')
         <div class="row">
@@ -17,7 +17,7 @@
                         class="form-control @error('nome') is-invalid @enderror"
                         name="nome"
                         placeholder="Nome"
-                        value="{{ $curso->nome }}"
+                        value="{{ $row->nome }}"
                     />
                     <label for="nome">Nome</label>
 
@@ -37,7 +37,7 @@
                         class="form-control @error('duracao') is-invalid @enderror"
                         name="duracao"
                         placeholder="Tempo de Duração"
-                        value="{{ $curso->duracao }}"
+                        value="{{ $row->duracao }}"
                     />
                     <label for="duracao">Duração</label>
 

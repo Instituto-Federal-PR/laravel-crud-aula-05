@@ -3,102 +3,64 @@
 namespace App\Http\Controllers;
 
 use App\Models\Disciplina;
-use App\Models\Curso;
 use App\Http\Requests\DisciplinaRequest;
+use App\Services\CursoService;
+use App\Services\DisciplinaService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
+use Override;
 
-class DisciplinaController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        Gate::authorize('viewAny', Disciplina::class);
-        $data = Disciplina::with(['curso'])->orderBy('nome')->get();
-        return view('disciplina.index', compact(['data']));
+class DisciplinaController extends BaseController {
+
+    protected array $view = [
+        'index'     => 'disciplina.index',
+        'create'    => 'disciplina.create',
+        'store'     => 'disciplina.index',
+        'show'      => 'disciplina.show',
+        'edit'      => 'disciplina.edit',
+        'update'    => 'disciplina.index',
+        'destroy'   => 'disciplina.index'
+    ];
+
+    protected array $with = ['curso'];
+
+    protected string $orderBy = 'nome';
+
+    public function __construct(
+        protected DisciplinaService $service,
+        protected CursoService $cursoService,
+        protected Disciplina $model,
+    ) {}
+
+    protected function getService(): mixed {
+        return $this->service;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        Gate::authorize('create', Disciplina::class);
-        $cursos = Curso::all();
-        return view('disciplina.create', compact(['cursos']));
+    protected function getModel(): Model {
+        return $this->model;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(DisciplinaRequest $request)
-    {
-        Gate::authorize('create', Disciplina::class);
-        Disciplina::create($request->validated());
-        return redirect()->route('disciplina.index');
+    protected function getRequestClass(): string {
+        return DisciplinaRequest::class;
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $disciplina = Disciplina::find($id);
-        Gate::authorize('view', $disciplina);
+    #[Override]
+    public function create() {
+        Gate::authorize('create', $this->model);
+        $cursos = $this->cursoService->all();
+        return view($this->view['create'], compact(['cursos']));
+    }
 
-        if(isset($disciplina)) {
-            return view('disciplina.show', compact(['disciplina']));
+    #[Override]
+    public function edit(string $id) {
+        $row = $this->service->find($id);
+        Gate::authorize('update', $row);
+
+        if(isset($row)) {
+            $cursos = $this->cursoService->all();
+            return view($this->view['edit'], compact(['row', 'cursos']));
         }
 
-        return "<h1>Disciplina não encontrada!</h1>";
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $disciplina = Disciplina::find($id);
-        Gate::authorize('update', $disciplina);
-        $cursos = Curso::all();
-
-        if(isset($disciplina)) {
-            return view('disciplina.edit', compact(['disciplina', 'cursos']));
-        }
-
-        return "<h1>Disciplina não encontrada!</h1>";
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(DisciplinaRequest $request, string $id)
-    {
-            $disciplina = Disciplina::find($id);
-            Gate::authorize('update', $disciplina);
-
-            if(isset($disciplina)) {
-                $disciplina->update($request->validated());
-                return redirect()->route('disciplina.index');
-            }
-
-            return "<h1>Disciplina não encontrada!</h1>";
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        $disciplina = Disciplina::find($id);
-        Gate::authorize('delete', $disciplina);
-
-        if(isset($disciplina)) {
-            $disciplina->delete();
-            return redirect()->route('disciplina.index');
-        }
-
-        return "<h1>Disciplina não encontrada!</h1>";
+        return "<h1>Não encontrado!</h1>";
     }
 }

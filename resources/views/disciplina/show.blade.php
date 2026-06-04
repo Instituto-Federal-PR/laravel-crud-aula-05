@@ -13,7 +13,7 @@
                 <input
                     type="text"
                     class="form-control"
-                    value="{{ $disciplina->nome }}"
+                    value="{{ $row->nome }}"
                     disabled
                 />
                 <label for="nome">Nome</label>
@@ -32,7 +32,7 @@
                 <input
                     type="number"
                     class="form-control"
-                    value="{{ $disciplina->carga_horaria }}"
+                    value="{{ $row->carga_horaria }}"
                     disabled
                 />
                 <label for="carga_horaria">Carga Horária</label>
@@ -46,7 +46,7 @@
                 <input
                     type="text"
                     class="form-control"
-                    value="{{ $disciplina->curso->nome }}"
+                    value="{{ $row->curso->nome }}"
                     disabled
                 />
                 <label for="curso">Curso</label>

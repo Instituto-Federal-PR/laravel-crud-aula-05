@@ -6,7 +6,7 @@
     ]
 )
 @section('conteudo')
-    <form action="{{route('disciplina.update', $disciplina->id)}}" method="POST">
+    <form action="{{route('disciplina.update', $row->id)}}" method="POST">
         @csrf
         @method('PUT')
         <div class="row">
@@ -17,7 +17,7 @@
                         class="form-control @error('nome') is-invalid @enderror"
                         name="nome"
                         placeholder="Nome"
-                        value="{{ $disciplina->nome }}"
+                        value="{{ $row->nome }}"
                     />
                     <label for="nome">Nome</label>
 
@@ -37,7 +37,7 @@
                         class="form-control @error('carga_horaria') is-invalid @enderror"
                         name="carga_horaria"
                         placeholder="Carga Horária"
-                        value="{{ $disciplina->carga_horaria }}"
+                        value="{{ $row->carga_horaria }}"
                     />
                     <label for="carga_horaria">Carga Horária</label>
 
@@ -59,7 +59,7 @@
                         class="form-select form-control input-required @error('curso_id') is-invalid @enderror"
                     >
                         @foreach ($cursos as $item)
-                            <option value="{{$item->id}}" @if($item->id == $disciplina->curso_id)) selected="true" @endif>
+                            <option value="{{$item->id}}" @if($item->id == $row->curso_id)) selected="true" @endif>
                                 {{ $item->nome }}
                             </option>
                         @endforeach
