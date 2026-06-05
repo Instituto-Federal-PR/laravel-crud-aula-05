@@ -8,7 +8,11 @@ abstract class BaseRepository {
 
     abstract protected function getModel(): mixed;
 
-    public function list(array $arrWith = [], string $orderBy = 'id') {
+    public function list(array $arrWith = [], array $where = [], string $orderBy = 'id') {
+        if(isset($where['field']) && isset($where['value'])) {
+            return $this->getModel()->with($arrWith)->where($where['field'], $where['value'])
+                ->orderBy($orderBy)->get();
+        }
         return $this->getModel()->with($arrWith)->orderBy($orderBy)->get();
     }
 

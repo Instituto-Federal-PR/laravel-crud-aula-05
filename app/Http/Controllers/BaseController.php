@@ -10,6 +10,7 @@ abstract class BaseController extends Controller {
 
     protected array $view = [];
     protected array $with = [];
+    protected array $where = [];
     protected string $orderBy = 'id';
 
     abstract protected function getService(): mixed;
@@ -18,7 +19,7 @@ abstract class BaseController extends Controller {
 
     public function index() {
         Gate::authorize('viewAny', $this->getModel());
-        $data = $this->getService()->all($this->with, $this->orderBy);
+        $data = $this->getService()->all($this->with, $this->where, $this->orderBy);
         return view($this->view['index'], compact(['data']));
     }
 
