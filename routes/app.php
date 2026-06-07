@@ -22,3 +22,5 @@ Route::resource('/aluno', AlunoController::class)
 Route::resource('/matricula', MatriculaController::class)
     ->middleware(['auth', 'verified']);
 
+Route::get('/audit/curso/{id}', [CursoController::class, 'audit'])
+    ->name('curso.audit')->middleware(['auth', 'verified']);

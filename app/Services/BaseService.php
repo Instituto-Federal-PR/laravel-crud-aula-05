@@ -29,4 +29,8 @@ abstract class BaseService {
     public function remove(int|string $id) {
         return $this->getRepository()->remove($id);
     }
+
+    public function audit(int|string $id) {
+        return $this->getRepository()->audit($id);
+    }
 }

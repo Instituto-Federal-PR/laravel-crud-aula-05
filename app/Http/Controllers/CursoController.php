@@ -16,7 +16,8 @@ class CursoController extends BaseController {
         'show'      => 'curso.show',
         'edit'      => 'curso.edit',
         'update'    => 'curso.index',
-        'destroy'   => 'curso.index'
+        'destroy'   => 'curso.index',
+        'audit'     => 'curso.audit',
     ];
 
     protected array $with = ['disciplina', 'aluno'];

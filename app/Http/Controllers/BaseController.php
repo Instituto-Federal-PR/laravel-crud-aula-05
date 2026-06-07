@@ -81,4 +81,16 @@ abstract class BaseController extends Controller {
 
         return "<h1>Não encontrado!</h1>";
     }
+
+    public function audit(string $id) {
+        Gate::authorize('delete',  $this->getModel());
+        $data = $this->getService()->audit($id);
+
+        if(isset($data)) {
+            // dd($data);
+            return view($this->view['audit'], compact(['data']));
+        }
+
+        return "<h1>Não encontrado!</h1>";
+    }
 }
