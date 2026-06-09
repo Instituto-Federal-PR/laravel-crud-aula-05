@@ -9,6 +9,6 @@ class DisciplinaRepository extends BaseRepository {
     public function __construct(protected Disciplina $model) { }
 
     protected function getModel(): mixed {
-        return $this->model;
+        return $this->model->newInstance();
     }
 }

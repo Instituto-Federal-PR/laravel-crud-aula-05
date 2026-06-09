@@ -9,6 +9,6 @@ class PermissionRepository extends BaseRepository {
     public function __construct(protected Permission $model) {}
 
     protected function getModel(): mixed {
-        return $this->model;
+        return $this->model->newInstance();
     }
 }

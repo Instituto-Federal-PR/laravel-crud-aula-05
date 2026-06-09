@@ -9,6 +9,6 @@ class CursoRepository extends BaseRepository {
     public function __construct(protected Curso $model) {}
 
     protected function getModel(): mixed {
-        return $this->model;
+        return $this->model->newInstance();
     }
 }
