@@ -13,7 +13,7 @@
                 <input
                     type="text"
                     class="form-control"
-                    value="{{ $row->nome }}"
+                    value="{{ $curso->nome }}"
                     disabled
                 />
                 <label for="nome">Nome</label>
@@ -32,7 +32,7 @@
                 <input
                     type="number"
                     class="form-control"
-                    value="{{ $row->duracao }}"
+                    value="{{ $curso->duracao }}"
                     disabled
                 />
                 <label for="duracao">Duração</label>

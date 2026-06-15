@@ -4,40 +4,85 @@ namespace App\Http\Controllers;
 
 use App\Models\Curso;
 use App\Http\Requests\CursoRequest;
+use Illuminate\Support\Facades\Gate;
 use App\Services\CursoService;
-use Illuminate\Database\Eloquent\Model;
 
-class CursoController extends BaseController {
+class CursoController extends Controller {
 
-    protected array $view = [
-        'index'     => 'curso.index',
-        'create'    => 'curso.create',
-        'store'     => 'curso.index',
-        'show'      => 'curso.show',
-        'edit'      => 'curso.edit',
-        'update'    => 'curso.index',
-        'destroy'   => 'curso.index',
-        'audit'     => 'curso.audit',
-    ];
+    public function __construct(protected CursoService $service) {}
 
-    protected array $with = ['disciplina', 'aluno'];
-
-    protected string $orderBy = 'nome';
-
-    public function __construct(
-        protected CursoService $service,
-        protected Curso $model
-    ) {}
-
-    protected function getService(): mixed {
-        return $this->service;
+    public function index() {
+        Gate::authorize('viewAny', Curso::class);
+        $data = $this->service->all(['disciplina', 'aluno'], [], 'nome');
+        return view('curso.index', compact(['data']));
     }
 
-    protected function getModel(): Model {
-        return $this->model;
+    public function create() {
+        Gate::authorize('create', Curso::class);
+        return view('curso.create');
     }
 
-    protected function getRequestClass(): string {
-        return CursoRequest::class;
+    public function store(CursoRequest $request) {
+        Gate::authorize('create', Curso::class);
+        $this->service->store($request->validated());
+        return redirect()->route('curso.index');
+    }
+
+    public function show(string $id) {
+        $curso = $this->service->find($id);
+        Gate::authorize('view', $curso);
+
+        if(isset($curso)) {
+            return view('curso.show', compact(['curso']));
+        }
+
+        return "<h1>Curso não encontrado!</h1>";
+    }
+
+    public function edit(string $id) {
+        $curso = $this->service->find($id);
+        Gate::authorize('update', $curso);
+
+        if(isset($curso)) {
+            return view('curso.edit', compact(['curso']));
+        }
+
+        return "<h1>Curso não encontrado!</h1>";
+    }
+
+    public function update(CursoRequest $request, string $id) {
+        $curso = $this->service->find($id);
+        Gate::authorize('update', $curso);
+
+        if(isset($curso)) {
+            $this->service->update($request->validated(), $id);
+            return redirect()->route('curso.index');
+        }
+
+        return "<h1>Curso não encontrado!</h1>";
+    }
+
+    public function destroy(string $id) {
+        $curso = $this->service->find($id);
+        Gate::authorize('delete', $curso);
+
+        if(isset($curso)) {
+            $this->service->remove($id);
+            return redirect()->route('curso.index');
+        }
+
+        return "<h1>Curso não encontrado!</h1>";
+    }
+
+    public function audit(string $id) {
+        $curso = $this->service->find($id);
+        Gate::authorize('delete', $curso);
+
+        if(isset($curso)) {
+            $data = $this->service->audit($id);
+            return view('curso.audit', compact(['data']));
+        }
+
+        return "<h1>Não encontrado!</h1>";
     }
 }

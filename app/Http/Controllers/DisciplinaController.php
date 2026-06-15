@@ -8,59 +8,78 @@ use App\Services\CursoService;
 use App\Services\DisciplinaService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
-use Override;
 
-class DisciplinaController extends BaseController {
 
-    protected array $view = [
-        'index'     => 'disciplina.index',
-        'create'    => 'disciplina.create',
-        'store'     => 'disciplina.index',
-        'show'      => 'disciplina.show',
-        'edit'      => 'disciplina.edit',
-        'update'    => 'disciplina.index',
-        'destroy'   => 'disciplina.index'
-    ];
-
-    protected array $with = ['curso'];
-
-    protected string $orderBy = 'nome';
+class DisciplinaController extends Controller {
 
     public function __construct(
         protected DisciplinaService $service,
-        protected CursoService $cursoService,
-        protected Disciplina $model,
+        protected CursoService $cursoService
     ) {}
 
-    protected function getService(): mixed {
-        return $this->service;
+    public function index() {
+        Gate::authorize('viewAny', Disciplina::class);
+        $data = $this->service->all(['curso'], [], 'nome');
+        return view('disciplina.index', compact(['data']));
     }
 
-    protected function getModel(): Model {
-        return $this->model;
-    }
-
-    protected function getRequestClass(): string {
-        return DisciplinaRequest::class;
-    }
-
-    #[Override]
     public function create() {
-        Gate::authorize('create', $this->model);
-        $cursos = $this->cursoService->all();
-        return view($this->view['create'], compact(['cursos']));
+        Gate::authorize('create', Disciplina::class);
+        $cursos = $this->cursoService->all([], [], 'nome');
+        return view('disciplina.create', compact(['cursos']));
     }
 
-    #[Override]
-    public function edit(string $id) {
-        $row = $this->service->find($id);
-        Gate::authorize('update', $row);
+    public function store(DisciplinaRequest $request) {
+        Gate::authorize('create', Disciplina::class);
+        $this->service->store($request->validated());
+        return redirect()->route('disciplina.index');
+    }
 
-        if(isset($row)) {
-            $cursos = $this->cursoService->all();
-            return view($this->view['edit'], compact(['row', 'cursos']));
+    public function show(string $id) {
+        $disciplina = $this->service->find($id, ['curso']);
+        Gate::authorize('view', $disciplina);
+
+        if(isset($disciplina)) {
+            return view('disciplina.show', compact(['disciplina']));
         }
 
-        return "<h1>Não encontrado!</h1>";
+        return "<h1>Disciplina não encontrada!</h1>";
+    }
+
+    public function edit(string $id) {
+        $disciplina = $this->service->find($id, ['curso']);
+        Gate::authorize('update', $disciplina);
+        $cursos = $this->cursoService->all([], [], 'nome');
+
+        if(isset($disciplina)) {
+            return view('disciplina.edit', compact(['disciplina', 'cursos']));
+        }
+
+        return "<h1>Disciplina não encontrada!</h1>";
+    }
+
+    public function update(DisciplinaRequest $request, string $id) {
+        $disciplina = $this->service->find($id);
+        Gate::authorize('update', $disciplina);
+
+        if(isset($disciplina)) {
+            $this->service->update($request->validated(), $id);
+            return redirect()->route('disciplina.index');
+        }
+
+        return "<h1>Disciplina não encontrada!</h1>";
+    }
+
+    public function destroy(string $id) {
+
+        $disciplina = $this->service->find($id);
+        Gate::authorize('delete', $disciplina);
+
+        if(isset($disciplina)) {
+            $this->service->remove($id);
+            return redirect()->route('disciplina.index');
+        }
+
+        return "<h1>Disciplina não encontrada!</h1>";
     }
 }
