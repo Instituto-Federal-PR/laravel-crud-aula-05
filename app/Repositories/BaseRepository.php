@@ -38,7 +38,7 @@ abstract class BaseRepository {
         return $row;
     }
 
-    public function remove(int|string $id): ?Model {
+    public function remove(int|string $id): ?bool {
         $row = $this->getModel()->findOrFail($id);
         return $row->delete();
     }

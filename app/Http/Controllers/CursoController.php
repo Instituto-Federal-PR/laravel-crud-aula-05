@@ -12,19 +12,31 @@ class CursoController extends Controller {
     public function __construct(protected CursoService $service) {}
 
     public function index() {
+
         Gate::authorize('viewAny', Curso::class);
         $data = $this->service->all(['disciplina', 'aluno'], [], 'nome');
+
+        if (request()->is('api/*')) return response()->json($data);
+
         return view('curso.index', compact(['data']));
     }
 
     public function create() {
+
         Gate::authorize('create', Curso::class);
+
+        if (request()->is('api/*')) return response()->json(['message' => 'Create!']);
+
         return view('curso.create');
     }
 
     public function store(CursoRequest $request) {
+
         Gate::authorize('create', Curso::class);
-        $this->service->store($request->validated());
+        $curso = $this->service->store($request->validated());
+
+        if ($request->is('api/*')) return response()->json($curso, 201);
+
         return redirect()->route('curso.index');
     }
 
@@ -33,6 +45,8 @@ class CursoController extends Controller {
         Gate::authorize('view', $curso);
 
         if(isset($curso)) {
+            if(request()->is('api/*')) return response()->json($curso);
+
             return view('curso.show', compact(['curso']));
         }
 
@@ -44,6 +58,8 @@ class CursoController extends Controller {
         Gate::authorize('update', $curso);
 
         if(isset($curso)) {
+            if(request()->is('api/*')) return response()->json($curso);
+
             return view('curso.edit', compact(['curso']));
         }
 
@@ -55,7 +71,9 @@ class CursoController extends Controller {
         Gate::authorize('update', $curso);
 
         if(isset($curso)) {
-            $this->service->update($request->validated(), $id);
+            $updated = $this->service->update($request->validated(), $id);
+            if(request()->is('api/*')) return response()->json($updated);
+
             return redirect()->route('curso.index');
         }
 
@@ -68,6 +86,9 @@ class CursoController extends Controller {
 
         if(isset($curso)) {
             $this->service->remove($id);
+
+            if(request()->is('api/*')) return response()->json(['message' => 'Curso removido com sucesso.']);
+
             return redirect()->route('curso.index');
         }
 
